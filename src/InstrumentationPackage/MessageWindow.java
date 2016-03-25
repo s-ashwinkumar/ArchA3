@@ -77,7 +77,7 @@ public class MessageWindow
 		ScreenWidth  = WindowSize.width;
 				
 		WindowHeight = (int)(ScreenHeight * 0.20);
-		WindowWidth  = (int)(ScreenWidth * 0.5);
+		WindowWidth  = (int)(ScreenWidth * 0.30);
 
 		/* Calculate the X and Y position of the window's upper left
 		** hand corner as a proportion of the screen
@@ -137,7 +137,7 @@ public class MessageWindow
 		ScreenWidth  = WindowSize.width;
 		
 		WindowHeight = (int)(ScreenHeight * 0.25);
-		WindowWidth  = (int)(ScreenWidth * 0.5);
+		WindowWidth  = (int)(ScreenWidth * 0.3);
 
 		UpperLeftX = Xpos;
 		UpperLeftY = Ypos;

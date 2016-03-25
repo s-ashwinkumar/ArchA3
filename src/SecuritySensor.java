@@ -1,16 +1,8 @@
 /******************************************************************************************************************
-* File:HumiditySensor.java
-* Course: 17655
-* Project: Assignment A3
-* Copyright: Copyright (c) 2009 Carnegie Mellon University
-* Versions:
-*	1.0 March 2009 - Initial rewrite of original assignment 3 (ajl).
-*
 * Description:
 *
-* This class simulates a humidity sensor. It polls the message manager for messages corresponding to changes in state
-* of the humidifier or dehumidifier and reacts to them by trending the relative humidity up or down. The current
-* relative humidity is posted to the message manager.
+* This class simulates a security sensor. It polls the message manager for messages corresponding to changes in state
+* of the door window and motion sensors and switches them off or on. 
 *
 * Parameters: IP address of the message manager (on command line). If blank, it is assumed that the message manager is
 * on the local machine.
@@ -18,31 +10,28 @@
 * Internal Methods:
 *	float GetRandomNumber()
 *	boolean CoinToss()
-*   void PostHumidity(MessageManagerInterface ei, float humidity )
+*   void PostTemperature(MessageManagerInterface ei, float temperature )
 *
 ******************************************************************************************************************/
 import InstrumentationPackage.*;
 import MessagePackage.*;
 import java.util.*;
 
-class HumiditySensor
+class SecuritySensor
 {
-
 	public static void main(String args[])
 	{
-		String MsgMgrIP;					// Message Manager IP address
-		Message Msg = null;					// Message object
-		MessageQueue eq = null;				// Message Queue
-		int MsgId = 0;						// User specified message ID
-		MessageManagerInterface em = null;	// Interface object to the message manager
-		boolean HumidifierState = false;	// Humidifier state: false == off, true == on
-		boolean DehumidifierState = false;	// Dehumidifier state: false == off, true == on
-		float RelativeHumidity;				// Current simulated ambient room humidity
-		float DriftValue;					// The amount of humidity gained or lost
-		int	Delay = 2500;					// The loop delay (2.5 seconds)
-		boolean Done = false;				// Loop termination flag
-
-
+		String MsgMgrIP;				// Message Manager IP address
+		Message Msg = null;				// Message object
+		MessageQueue eq = null;			// Message Queue
+		int MsgId = 0;					// User specified message ID
+		MessageManagerInterface em = null;// Interface object to the message manager
+		boolean DoorState = true;	// Door state: false == off, true == on
+		boolean WindowState = true;	// Window state: false == off, true == on
+                boolean MSensorState = true;	// Motion Sensor state: false == off, true == on
+                int sensor=0;
+		int	Delay = 2500;				// The loop delay (2.5 seconds)
+		boolean Done = false;			// Loop termination flag
 
 		/////////////////////////////////////////////////////////////////////////////////
 		// Get the IP address of the message manager
@@ -95,18 +84,19 @@ class HumiditySensor
 		// Here we check to see if registration worked. If ef is null then the
 		// message manager interface was not properly created.
 
+
 		if (em != null)
 		{
 
 			// We create a message window. Note that we place this panel about 1/2 across
-			// and 2/3s down the screen
+			// and 1/3 down the screen
 
-			float WinPosX = 0.35f; 	//This is the X position of the message window in terms
-									//of a percentage of the screen height
-			float WinPosY = 0.60f;	//This is the Y position of the message window in terms
+			float WinPosX = 0.7f; 	//This is the X position of the message window in terms
+								 	//of a percentage of the screen height
+			float WinPosY = 0.0f; 	//This is the Y position of the message window in terms
 								 	//of a percentage of the screen height
 
-			MessageWindow mw = new MessageWindow("Humidity Sensor", WinPosX, WinPosY);
+			MessageWindow mw = new MessageWindow("Security Sensor", WinPosX, WinPosY );
 
 			mw.WriteMessage("Registered with the message manager." );
 
@@ -123,22 +113,21 @@ class HumiditySensor
 
 			} // catch
 
-			mw.WriteMessage("\nInitializing Humidity Simulation::" );
+			mw.WriteMessage("\nInitializing Sensors Simulation::" );
 
-			RelativeHumidity = GetRandomNumber() * (float) 100.00;
 
 			if ( CoinToss() )
 			{
-				DriftValue = GetRandomNumber() * (float) -1.0;
+				sensor=GetRandomNumber()+1;
 
 			} else {
 
-				DriftValue = GetRandomNumber();
+				sensor=0;
 
 			} // if
 
-			mw.WriteMessage("   Initial Humidity Set:: " + RelativeHumidity );
-			// mw.WriteMessage("   Drift Value Set:: " + DriftValue ); // Used to debug the random drift values
+			mw.WriteMessage("   Initial Security Set (0 for off):: " + sensor );
+			// mw.WriteMessage("   Drift Value Set:: " + DriftValue ); // used to debug random temperature drift
 
 			/********************************************************************
 			** Here we start the main simulation loop
@@ -149,11 +138,11 @@ class HumiditySensor
 
 			while ( !Done )
 			{
-				// Post the current relative humidity
+				// Post the current temperature
 
-				PostHumidity( em, RelativeHumidity );
+				PostSecurity( em, sensor );
 
-				mw.WriteMessage("Current Relative Humidity:: " + RelativeHumidity + "%");
+				mw.WriteMessage("Current Sensor set (0 for off)::  " + sensor);
 
 				// Get the message queue
 
@@ -170,12 +159,12 @@ class HumiditySensor
 				} // catch
 
 				// If there are messages in the queue, we read through them.
-				// We are looking for MessageIDs = -4, this means the the humidify or
-				// dehumidifier has been turned on/off. Note that we get all the messages
-				// from the queue at once... there is a 2.5 second delay between samples,..
-				// so the assumption is that there should only be a message at most.
+				// We are looking for MessageIDs = -5, this means the the heater
+				// or chiller has been turned on/off. Note that we get all the messages
+				// at once... there is a 2.5 second delay between samples,.. so
+				// the assumption is that there should only be a message at most.
 				// If there are more, it is the last message that will effect the
-				// output of the humidity as it would in reality.
+				// output of the temperature as it would in reality.
 
 				int qlen = eq.GetSize();
 
@@ -183,29 +172,41 @@ class HumiditySensor
 				{
 					Msg = eq.GetMessage();
 
-					if ( Msg.GetMessageId() == -4 )
+					if ( Msg.GetMessageId() == -6 )
 					{
-						if (Msg.GetMessage().equalsIgnoreCase("H1")) // humidifier on
+						if (Msg.GetMessage().equalsIgnoreCase("D1")) // Door on
 						{
-							HumidifierState = true;
+							DoorState = true;
 
 						} // if
 
-						if (Msg.GetMessage().equalsIgnoreCase("H0")) // humidifier off
+						if (Msg.GetMessage().equalsIgnoreCase("D0")) // Door off
 						{
-							HumidifierState = false;
+							DoorState = false;
 
 						} // if
 
-						if (Msg.GetMessage().equalsIgnoreCase("D1")) // dehumidifier on
+						if (Msg.GetMessage().equalsIgnoreCase("W1")) // window on
 						{
-							DehumidifierState = true;
+							WindowState = true;
 
 						} // if
 
-						if (Msg.GetMessage().equalsIgnoreCase("D0")) // dehumidifier off
+						if (Msg.GetMessage().equalsIgnoreCase("W0")) // window off
 						{
-							DehumidifierState = false;
+							WindowState = false;
+
+						}// if
+
+						if (Msg.GetMessage().equalsIgnoreCase("M1")) // Motion Sensor on
+						{
+							MSensorState = true;
+
+						} // if
+
+						if (Msg.GetMessage().equalsIgnoreCase("M1")) // Motion Sensor off
+						{
+							MSensorState = false;
 
 						} // if
 
@@ -237,26 +238,15 @@ class HumiditySensor
 
 				} // for
 
-				// Now we trend the relative humidity according to the status of the
-				// humidifier/dehumidifier controller.
+				// Now we trend the temperature according to the status of the
+				// Door/chiller controller.
 
-				if (HumidifierState)
+				if (DoorState || WindowState || MSensorState)
 				{
-					RelativeHumidity += GetRandomNumber();
+                                    if(CoinToss())
+                                        sensor = 0;
 
-				} // if humidifier is on
-
-				if (!HumidifierState && !DehumidifierState)
-				{
-					RelativeHumidity += DriftValue;
-
-				} // if both the humidifier and dehumidifier are off
-
-				if (DehumidifierState)
-				{
-					RelativeHumidity -= GetRandomNumber();
-
-				} // if dehumidifier is on
+				} // if either sensor is on again generate random and switch off
 
 				// Here we wait for a 2.5 seconds before we start the next sample
 
@@ -284,8 +274,7 @@ class HumiditySensor
 
 	/***************************************************************************
 	* CONCRETE METHOD:: GetRandomNumber
-	* Purpose: This method provides the simulation with random floating point
-	*		   humidity values between 0.1 and 0.9.
+	* Purpose: This method provides the simulation for on and off 
 	*
 	* Arguments: None.
 	*
@@ -295,19 +284,12 @@ class HumiditySensor
 	*
 	***************************************************************************/
 
-	static private float GetRandomNumber()
+	static private int GetRandomNumber()
 	{
 		Random r = new Random();
-		Float Val;
-
-		Val = Float.valueOf((float)-1.0);
-
-		while( Val < 0.1 )
-		{
-			Val = r.nextFloat();
-	 	}
-
-		return( Val.floatValue() );
+		int Val;
+        	Val = r.nextInt();
+		return( (Val%3) );
 
 	} // GetRandomNumber
 
@@ -333,14 +315,14 @@ class HumiditySensor
 	} // CoinToss
 
 	/***************************************************************************
-	* CONCRETE METHOD:: PostHumidity
-	* Purpose: This method posts the specified relative humidity value to the
-	* specified message manager. This method assumes an message ID of 2.
+	* CONCRETE METHOD:: PostTemperature
+	* Purpose: This method posts the specified temperature value to the
+	* specified message manager. This method assumes an message ID of 1.
 	*
 	* Arguments: MessageManagerInterface ei - this is the messagemanger interface
 	*			 where the message will be posted.
 	*
-	*			 float humidity - this is the humidity value.
+	*			 0,1,2,3  : 0 for no sensor on, 1 for door, 2 for window and 3 for motion sensor
 	*
 	* Returns: none
 	*
@@ -348,27 +330,27 @@ class HumiditySensor
 	*
 	***************************************************************************/
 
-	static private void PostHumidity(MessageManagerInterface ei, float humidity )
+	static private void PostSecurity(MessageManagerInterface ei, int sensor )
 	{
 		// Here we create the message.
 
-		Message msg = new Message( (int) 2, String.valueOf(humidity) );
+		Message msg = new Message( (int) 3, String.valueOf(sensor) );
 
 		// Here we send the message to the message manager.
 
 		try
 		{
 			ei.SendMessage( msg );
-			//mw.WriteMessage( "Sent Humidity Message" );
+			//System.out.println( "Sent Temp Message" );
 
 		} // try
 
 		catch (Exception e)
 		{
-			System.out.println( "Error Posting Relative Humidity:: " + e );
+			System.out.println( "Error Posting Security:: " + e );
 
 		} // catch
 
-	} // PostHumidity
+	} // PostTemperature
 
-} // Humidity Sensor
+} // TemperatureSensor

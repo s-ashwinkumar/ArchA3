@@ -99,7 +99,7 @@ class TemperatureSensor
 			// We create a message window. Note that we place this panel about 1/2 across
 			// and 1/3 down the screen
 
-			float WinPosX = 0.5f; 	//This is the X position of the message window in terms
+			float WinPosX = 0.35f; 	//This is the X position of the message window in terms
 								 	//of a percentage of the screen height
 			float WinPosY = 0.3f; 	//This is the Y position of the message window in terms
 								 	//of a percentage of the screen height
