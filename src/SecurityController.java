@@ -111,9 +111,9 @@ class SecurityController
 
 			// Put the status indicators under the panel...
 
-			Indicator di = new Indicator ("Door OFF", mw.GetX(), mw.GetY()+mw.Height());
-			Indicator wi = new Indicator ("Window OFF", mw.GetX()+(di.Width()*2), mw.GetY()+mw.Height());
-                        Indicator mi = new Indicator ("MSensors OFF", mw.GetX()+(wi.Width()*4), mw.GetY()+mw.Height());
+			Indicator di = new Indicator ("Door Not Triggered", mw.GetX(), mw.GetY()+mw.Height());
+			Indicator wi = new Indicator ("Window Not Triggered", mw.GetX()+(di.Width()*2), mw.GetY()+mw.Height());
+                        Indicator mi = new Indicator ("MSensors Not Triggered", mw.GetX()+(wi.Width()*4), mw.GetY()+mw.Height());
 
 			mw.WriteMessage("Registered with the message manager." );
 
@@ -198,14 +198,14 @@ class SecurityController
 
 						} // if
 
-						if (Msg.GetMessage().equalsIgnoreCase("C0")) // Window off
+						if (Msg.GetMessage().equalsIgnoreCase("W0")) // Window off
 						{
 							WindowState = false;
 							mw.WriteMessage("Received Window off message" );
 
 							// Confirm that the message was recieved and acted on
 
-							ConfirmMessage( em, "C0" );
+							ConfirmMessage( em, "W0" );
 
 						} // if
                                                 
@@ -271,12 +271,12 @@ class SecurityController
 				{
 					// Set to green, Door is on
 
-					di.SetLampColorAndMessage("Door ON", 1);
+					di.SetLampColorAndMessage("Door Triggered", 3);
 
 				} else {
 
 					// Set to black, Door is off
-					di.SetLampColorAndMessage("Door OFF", 0);
+					di.SetLampColorAndMessage("Door Intact", 1);
 
 				} // if
 
@@ -284,13 +284,13 @@ class SecurityController
 				{
 					// Set to green, Window is on
 
-					wi.SetLampColorAndMessage("Window ON", 1);
+					wi.SetLampColorAndMessage("Window Triggered", 3);
 
 				} else {
 
 					// Set to black, Window is off
 
-					wi.SetLampColorAndMessage("Window OFF", 0);
+					wi.SetLampColorAndMessage("Window Intact", 1);
 
 				} // if
 
@@ -298,13 +298,13 @@ class SecurityController
 				{
 					// Set to green, Window is on
 
-					mi.SetLampColorAndMessage("MSensor ON", 1);
+					mi.SetLampColorAndMessage("MSensor Triggered", 3);
 
 				} else {
 
 					// Set to black, Window is off
 
-					mi.SetLampColorAndMessage("MSensor OFF", 0);
+					mi.SetLampColorAndMessage("MSensor Intact", 0);
 
 				} // if
 

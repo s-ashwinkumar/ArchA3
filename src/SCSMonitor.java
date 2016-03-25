@@ -26,12 +26,16 @@ class SCSMonitor extends Thread {
 
     private MessageManagerInterface em = null;	// Interface object to the message manager
     private String MsgMgrIP = null;				// Message Manager IP address
-    private int sensor = 0;
+    private int arm = 0;
+
     boolean Registered = true;					// Signifies that this class is registered with an message manager.
     MessageWindow mw = null;					// This is the message window
     Indicator di;								// Door indicator
     Indicator wi;                               // Window indicator
     Indicator mi;								// Motion indicator
+    int windowBroken = 0;
+    int doorOpen = 0;
+    int motionDetected = 0;
 
     public SCSMonitor() {
         // message manager is on the local system
@@ -68,11 +72,23 @@ class SCSMonitor extends Thread {
 
     } // Constructor
 
+    public void setWindowBroken(int windowBroken) {
+        this.windowBroken = windowBroken;
+    }
+
+    public void setDoorOpen(int doorOpen) {
+        this.doorOpen = doorOpen;
+    }
+
+    public void setMotionDetected(int motionDetected) {
+        this.motionDetected = motionDetected;
+    }
+
     public void run() {
         Message Msg = null;				// Message object
         MessageQueue eq = null;			// Message Queue
         int MsgId = 0;					// User specified message ID
-        int sensor = 0;
+
         int Delay = 1000;				// The loop delay (1 second)
         boolean Done = false;			// Loop termination flag
         boolean ON = true;				// Used to turn on heaters, chillers, humidifiers, and dehumidifiers
@@ -85,10 +101,8 @@ class SCSMonitor extends Thread {
             // This panel is placed in the upper left hand corner and the status
             // indicators are placed directly to the right, one on top of the other
 
-            mw = new MessageWindow("ECS Monitoring Console", 0, 0);
-            di = new Indicator("DOOR UNK", mw.GetX() + mw.Width(), 0);
-            wi = new Indicator("WINDOW UNK", mw.GetX() + mw.Width(), (int) (mw.Height() / 2), 2);
-            mi = new Indicator("MOTION SENSOR UNK", mw.GetX() + mw.Width(), (int) (mw.Height() / 4), 2);
+            mw = new MessageWindow("SCS Monitoring Console", 0, 0);
+            di = new Indicator("SECURITY UNK", mw.GetX() + mw.Width(), 0);
 
             mw.WriteMessage("Registered with the message manager.");
 
@@ -132,10 +146,25 @@ class SCSMonitor extends Thread {
                 for (int i = 0; i < qlen; i++) {
                     Msg = eq.GetMessage();
 
-                    if (Msg.GetMessageId() == 3) // Temperature reading
+                    if (Msg.GetMessageId() == 3) // Security (arm disarm) reading
                     {
                         try {
-                            sensor = Integer.valueOf(Msg.GetMessage());
+                            int temp = Integer.valueOf(Msg.GetMessage());
+                            switch (temp) {
+                                case 1:
+                                    doorOpen = 1;
+                                    break;
+                                case 2:
+                                    windowBroken = 1;
+                                    break;
+                                case 3:
+                                    motionDetected = 1;
+                                    break;
+                                default:
+                                    doorOpen = 0;
+                                    windowBroken = 0;
+                                    motionDetected = 0;
+                            }
 
                         } // try
                         catch (Exception e) {
@@ -165,56 +194,25 @@ class SCSMonitor extends Thread {
                         // Get rid of the indicators. The message panel is left for the
                         // user to exit so they can see the last message posted.
                         wi.dispose();
-                        di.dispose();
 
                     } // if
 
                 } // for
 
-                mw.WriteMessage("Sensor on is (0 for none, 1,2 & 3 for Door Window And Motion):: " + sensor);
 
-                // Check temperature and effect control as necessary
-                if (sensor == 0) // temperature is below threshhold
+                if (arm == 1) // temperature is below threshhold
                 {
-                    di.SetLampColorAndMessage("Door alarm off", 1);
-                    wi.SetLampColorAndMessage("Window alarm off", 1);
-                    mi.SetLampColorAndMessage("Motion alarm off", 1);
-                    Door(OFF);
-                    Window(OFF);
-                    Motion(OFF);
-
-                } else if (sensor == 1) // temperature is above threshhold
-                {
-                    di.SetLampColorAndMessage("Door alarm on", 3);
-                    Door(ON);
-
-                } else if (sensor == 2) // temperature is above threshhold
-                {
-                    wi.SetLampColorAndMessage("Window alarm on", 3);
-                    Window(ON);
-
-                } else if (sensor == 3){
-
-                    mi.SetLampColorAndMessage("Motion alarm on", 3);
-                    Motion(ON);
-
-                }else if (sensor == 4) // temperature is above threshhold
-                {
-                    di.SetLampColorAndMessage("Door alarm off", 1);
-                    Door(OFF);
-
-                } else if (sensor == 5) // temperature is above threshhold
-                {
-                    wi.SetLampColorAndMessage("Window alarm off", 1);
-                    Window(OFF);
-
-                } else if (sensor == 6){
-
-                    mi.SetLampColorAndMessage("Motion alarm off", 1);
-                    Motion(OFF);
-
-                } // if // if
-
+                    if (doorOpen == 1 || windowBroken == 1 || motionDetected == 1) {
+                        di.SetLampColorAndMessage("Alarm Ringing", 3);
+                    } else {
+                        di.SetLampColorAndMessage("Alarm Not Ringing", 1);
+                    }
+                } else {
+                    di.SetLampColorAndMessage("System Deactivated", 2);
+                }
+                Door(doorOpen == 1);
+                Window(windowBroken == 1);
+                Motion(motionDetected == 1);
                 // This delay slows down the sample rate to Delay milliseconds
                 try {
                     Thread.sleep(Delay);
@@ -252,19 +250,21 @@ class SCSMonitor extends Thread {
         return (Registered);
 
     }
-     /**
+
+    /**
      * *************************************************************************
-     * Arguments: none
+     * Arguments: arm 1 or 0
      *
-     * Returns: boolean true if registered, false if not registered
+     * Returns: nothing
      *
      * Exceptions: None
      *
      **************************************************************************
      */
-    public void SetSensor(int val) {
-        sensor = val;
+    public void setArm(int arm) {
+        this.arm = arm;
     }
+
     /**
      * *************************************************************************
      * CONCRETE METHOD:: Halt Purpose: This method posts an message that stops
@@ -416,6 +416,6 @@ class SCSMonitor extends Thread {
 
         } // catch
 
-    } 
+    }
 
 } // SCSMonitor

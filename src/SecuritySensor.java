@@ -26,9 +26,9 @@ class SecuritySensor
 		MessageQueue eq = null;			// Message Queue
 		int MsgId = 0;					// User specified message ID
 		MessageManagerInterface em = null;// Interface object to the message manager
-		boolean DoorState = true;	// Door state: false == off, true == on
-		boolean WindowState = true;	// Window state: false == off, true == on
-                boolean MSensorState = true;	// Motion Sensor state: false == off, true == on
+		boolean DoorTriggered = false;	// Door state: false == off, true == on
+		boolean WindowTriggered = false;	// Window state: false == off, true == on
+                boolean MSeonsorTriggered = false;	// Motion Sensor state: false == off, true == on
                 int sensor=0;
 		int	Delay = 2500;				// The loop delay (2.5 seconds)
 		boolean Done = false;			// Loop termination flag
@@ -113,34 +113,17 @@ class SecuritySensor
 
 			} // catch
 
-			mw.WriteMessage("\nInitializing Sensors Simulation::" );
-
-
-			if ( CoinToss() )
-			{
-				sensor=GetRandomNumber()+1;
-
-			} else {
-
-				sensor=0;
-
-			} // if
-
-			mw.WriteMessage("   Initial Security Set (0 for off):: " + sensor );
-			// mw.WriteMessage("   Drift Value Set:: " + DriftValue ); // used to debug random temperature drift
-
-			/********************************************************************
-			** Here we start the main simulation loop
-			*********************************************************************/
-
-			mw.WriteMessage("Beginning Simulation... ");
-
-
 			while ( !Done )
 			{
 				// Post the current temperature
-
-				PostSecurity( em, sensor );
+                                if(DoorTriggered)
+                                    PostSecurity( em, 1 );
+                                if(WindowTriggered)
+                                    PostSecurity( em, 2 );
+                                if(MSeonsorTriggered)
+                                    PostSecurity(em, 3);
+                                if(!DoorTriggered && !MSeonsorTriggered && !WindowTriggered)
+                                    PostSecurity(em, 0);
 
 				mw.WriteMessage("Current Sensor set (0 for off)::  " + sensor);
 
@@ -174,39 +157,39 @@ class SecuritySensor
 
 					if ( Msg.GetMessageId() == -6 )
 					{
-						if (Msg.GetMessage().equalsIgnoreCase("D1")) // Door on
+						if (Msg.GetMessage().equalsIgnoreCase("D1")) // Door Triggered
 						{
-							DoorState = true;
+							DoorTriggered = true;
 
 						} // if
 
-						if (Msg.GetMessage().equalsIgnoreCase("D0")) // Door off
+						if (Msg.GetMessage().equalsIgnoreCase("D0")) // Door Intact
 						{
-							DoorState = false;
+							DoorTriggered = false;
 
 						} // if
 
-						if (Msg.GetMessage().equalsIgnoreCase("W1")) // window on
+						if (Msg.GetMessage().equalsIgnoreCase("W1")) // window Triggered
 						{
-							WindowState = true;
+							WindowTriggered = true;
 
 						} // if
 
-						if (Msg.GetMessage().equalsIgnoreCase("W0")) // window off
+						if (Msg.GetMessage().equalsIgnoreCase("W0")) // window Intact
 						{
-							WindowState = false;
+							WindowTriggered = false;
 
 						}// if
 
-						if (Msg.GetMessage().equalsIgnoreCase("M1")) // Motion Sensor on
+						if (Msg.GetMessage().equalsIgnoreCase("M1")) // Motion Sensor Triggered
 						{
-							MSensorState = true;
+							MSeonsorTriggered = true;
 
 						} // if
 
-						if (Msg.GetMessage().equalsIgnoreCase("M1")) // Motion Sensor off
+						if (Msg.GetMessage().equalsIgnoreCase("M0l")) // Motion Sensor Intact
 						{
-							MSensorState = false;
+							MSeonsorTriggered = false;
 
 						} // if
 
@@ -238,15 +221,7 @@ class SecuritySensor
 
 				} // for
 
-				// Now we trend the temperature according to the status of the
-				// Door/chiller controller.
-
-				if (DoorState || WindowState || MSensorState)
-				{
-                                    if(CoinToss())
-                                        sensor = 0;
-
-				} // if either sensor is on again generate random and switch off
+			
 
 				// Here we wait for a 2.5 seconds before we start the next sample
 

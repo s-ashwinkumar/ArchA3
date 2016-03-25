@@ -57,29 +57,50 @@ public class SCSConsole {
                     System.out.println("Using local message manger \n");
                 }
 
-                System.out.println("Select an Option: \n");
-                System.out.println("1: Turn On Door sensor");
-                System.out.println("2: Turn On window sensor");
-                System.out.println("3: Turn On Motion sensor");
-                System.out.println("4: Turn Off Door sensor");
-                System.out.println("5: Turn Off window sensor");
-                System.out.println("6: Turn Off Motion sensor");
-                System.out.println("7: Turn Off All sensors");
+                System.out.println("Select an Option: To Simulate and alarm \n ");
+                System.out.println("1: Arm System");
+                System.out.println("2: Disarm System");
+                System.out.println("3: Trigger Motion sensor");
+                System.out.println("4: Trigger Door sensor");
+                System.out.println("5: Trigger window sensor");
+                System.out.println("6: Reboot All sensors");
                 System.out.println("X: Stop System\n");
                 System.out.print("\n>>>> ");
                 Option = UserInput.KeyboardReadString();
 
                 //////////// option 1 to 6 ////////////
-                if (Option.equals("1") || Option.equals("2") || Option.equals("3") || Option.equals("4") || Option.equals("5") || Option.equals("6")) {
-                    Monitor.SetSensor(Integer.parseInt(Option));
-
-                } // if
-
-                //////////// option 7 ////////////    
-                if (Option.equals("7") ) {
+                if (Option.equals("1") ) {
                    
-                    Monitor.SetSensor(0);
+                    Monitor.setArm(1);
                 } // if
+                
+                if (Option.equals("2") ) {
+                   
+                    Monitor.setArm(0);
+                } // if
+                
+                if (Option.equals("3") ) {
+                   
+                    Monitor.setMotionDetected(1);
+                } // if
+                
+                if (Option.equals("4") ) {
+                   
+                    Monitor.setDoorOpen(1);
+                } // if
+                
+                if (Option.equals("5") ) {
+                   
+                    Monitor.setWindowBroken(1);
+                } // if
+                
+                if (Option.equals("6") ) {
+                   
+                    Monitor.setMotionDetected(0);
+                    Monitor.setDoorOpen(0);
+                    Monitor.setWindowBroken(0);
+                } // if
+                
                 //////////// option X ////////////
                 if (Option.equalsIgnoreCase("X")) {
                     // Here the user is done, so we set the Done flag and halt

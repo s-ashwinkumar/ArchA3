@@ -314,7 +314,8 @@ class TemperatureController
 	*
 	***************************************************************************/
 
-	static private void ConfirmMessage(MessageManagerInterface ei, String m )
+	
+        static private void ConfirmMessage(MessageManagerInterface ei, String m )
 	{
 		// Here we create the message.
 
