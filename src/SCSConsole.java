@@ -95,7 +95,7 @@ public class SCSConsole {
                 } // if
                 
                 if (Option.equals("6") ) {
-                   
+                    Monitor.setCritical(false);
                     Monitor.setMotionDetected(0);
                     Monitor.setDoorOpen(0);
                     Monitor.setWindowBroken(0);
@@ -110,7 +110,7 @@ public class SCSConsole {
                     // become dead queues and they collect messages and will eventually
                     // cause problems for the message manager.
 
-                    Monitor.Halt();
+//                    Monitor.Halt();
                     Done = true;
                     System.out.println("\nConsole Stopped... Exit monitor mindow to return to command prompt.");
                     Monitor.Halt();

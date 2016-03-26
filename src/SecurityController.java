@@ -36,9 +36,9 @@ class SecurityController
 		MessageQueue eq = null;				// Message Queue
 		int MsgId = 0;						// User specified message ID
 		MessageManagerInterface em = null;	// Interface object to the message manager
-		boolean WindowState = true;		// Window state: false == off, true == on
-		boolean DoorState = true;		// Door state: false == off, true == on
-		boolean MSensorState = true;		// Motion Sensor state: false == off, true == on
+		boolean WindowState = false;		// Window state: false == off, true == on
+		boolean DoorState = false;		// Door state: false == off, true == on
+		boolean MSensorState = false;		// Motion Sensor state: false == off, true == on
 		int	Delay = 2500;					// The loop delay (2.5 seconds)
 		boolean Done = false;				// Loop termination flag
 
@@ -211,7 +211,7 @@ class SecurityController
                                                 
                                                 if (Msg.GetMessage().equalsIgnoreCase("M1")) // Motion Sensor on
 						{
-							WindowState = true;
+							MSensorState = true;
 							mw.WriteMessage("Received Motion Sensor on message" );
 
 							// Confirm that the message was recieved and acted on
@@ -222,7 +222,7 @@ class SecurityController
 
 						if (Msg.GetMessage().equalsIgnoreCase("M0")) // Motion Sensor off
 						{
-							WindowState = false;
+							MSensorState = false;
 							mw.WriteMessage("Received Motion Sensor off message" );
 
 							// Confirm that the message was recieved and acted on
@@ -304,7 +304,7 @@ class SecurityController
 
 					// Set to black, Window is off
 
-					mi.SetLampColorAndMessage("MSensor Intact", 0);
+					mi.SetLampColorAndMessage("MSensor Intact", 1);
 
 				} // if
 

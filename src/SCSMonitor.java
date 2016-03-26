@@ -21,12 +21,15 @@
  */
 import InstrumentationPackage.*;
 import MessagePackage.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 class SCSMonitor extends Thread {
 
     private MessageManagerInterface em = null;	// Interface object to the message manager
     private String MsgMgrIP = null;				// Message Manager IP address
-    private int arm = 0;
+    private int arm = 1;
+    private boolean critical = true;
 
     boolean Registered = true;					// Signifies that this class is registered with an message manager.
     MessageWindow mw = null;					// This is the message window
@@ -53,6 +56,10 @@ class SCSMonitor extends Thread {
         } // catch
 
     } //Constructor
+
+    public void setCritical(boolean critical) {
+        this.critical = critical;
+    }
 
     public SCSMonitor(String MsgIpAddress) {
         // message manager is not on the local system
@@ -146,24 +153,28 @@ class SCSMonitor extends Thread {
                 for (int i = 0; i < qlen; i++) {
                     Msg = eq.GetMessage();
 
-                    if (Msg.GetMessageId() == 3) // Security (arm disarm) reading
+                    if (arm == 1 && Msg.GetMessageId() == 3) // Security (arm disarm) reading
                     {
                         try {
                             int temp = Integer.valueOf(Msg.GetMessage());
                             switch (temp) {
                                 case 1:
                                     doorOpen = 1;
+                                    mw.WriteMessage("Door Trigger from sensor: ");
                                     break;
                                 case 2:
                                     windowBroken = 1;
+                                    mw.WriteMessage("window Trigger from sensor: ");
                                     break;
                                 case 3:
                                     motionDetected = 1;
+                                    mw.WriteMessage("Motion Trigger from sensor: ");
                                     break;
                                 default:
                                     doorOpen = 0;
                                     windowBroken = 0;
                                     motionDetected = 0;
+                                    mw.WriteMessage("No Trigger from sensor: ");
                             }
 
                         } // try
@@ -199,20 +210,28 @@ class SCSMonitor extends Thread {
 
                 } // for
 
+                Door(doorOpen == 1);
+                mw.WriteMessage("Door data to Controller:: " + (doorOpen == 1));
+                Window(windowBroken == 1);
+                mw.WriteMessage("Window data to Controller:: " + (windowBroken == 1));
+                Motion(motionDetected == 1);
+                mw.WriteMessage("Motion data to Controller:: " + (motionDetected == 1));
 
                 if (arm == 1) // temperature is below threshhold
                 {
+                    mw.WriteMessage("System Armed:: ");
                     if (doorOpen == 1 || windowBroken == 1 || motionDetected == 1) {
                         di.SetLampColorAndMessage("Alarm Ringing", 3);
                     } else {
                         di.SetLampColorAndMessage("Alarm Not Ringing", 1);
                     }
                 } else {
+
+                    mw.WriteMessage("System Disarmed:: ");
                     di.SetLampColorAndMessage("System Deactivated", 2);
+
                 }
-                Door(doorOpen == 1);
-                Window(windowBroken == 1);
-                Motion(motionDetected == 1);
+
                 // This delay slows down the sample rate to Delay milliseconds
                 try {
                     Thread.sleep(Delay);
