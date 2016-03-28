@@ -39,7 +39,7 @@ class MaintenanceConsole
         boolean WindowState = false;        // Window state: false == off, true == on
         boolean DoorState = false;      // Door state: false == off, true == on
         boolean MSensorState = false;       // Motion Sensor state: false == off, true == on
-        int Delay = 2500;                   // The loop delay (2.5 seconds)
+        int Delay = 5000;                   // The loop delay (5 seconds)
         boolean Done = false;               // Loop termination flag
         // Map<Integer, String> Description = new HashMap<Integer, String>();
 
@@ -145,6 +145,7 @@ class MaintenanceConsole
 
             while ( !Done )
             {
+                System.out.println("-----Check Start-----");
 
                 try
                 {
@@ -167,16 +168,18 @@ class MaintenanceConsole
                 // output of the temperature as it would in reality.
 
                 int qlen = eq.GetSize();
-
+                Set<String> set = new HashSet<String>();
                 for ( int i = 0; i < qlen; i++ )
                 {
-                    System.out.println("-----Check Start-----");
-                    Msg = eq.GetMessage();
 
+                    Msg = eq.GetMessage();
+                    if(Msg.GetMessageId() == -100 && set.contains(Msg.GetMessage()))
+                        continue;
                     if( Msg.GetMessageId() == -100){
                         String[] description = Msg.GetMessage().split("#");
                         System.out.println( description[0] + "is on.");
                         System.out.println( description[1]);
+                        set.add(Msg.GetMessage());
                     }
 
 
@@ -211,7 +214,7 @@ class MaintenanceConsole
                     } // if
 
                 } // for
-                System.out.println("-----Check Start-----");
+                System.out.println("-----Check End-----");
 
                 try
                 {
