@@ -162,6 +162,7 @@ class SecurityController
 				for ( int i = 0; i < qlen; i++ )
 				{
 					Msg = eq.GetMessage();
+					HeartBeat.SendHeartBeat(em, "Security Controller#XXX ");
 
 					if ( Msg.GetMessageId() == 6 )
 					{

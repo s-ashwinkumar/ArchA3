@@ -61,7 +61,6 @@ public class ECSConsole
 			while (!Done)
 			{
 				// Here, the main thread continues and provides the main menu
-
 				System.out.println( "\n\n\n\n" );
 				System.out.println( "Environmental Control System (ECS) Command Console: \n" );
 

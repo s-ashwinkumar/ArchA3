@@ -139,7 +139,7 @@ class TemperatureController
 
 			while ( !Done )
 			{
-
+				HeartBeat.SendHeartBeat(em, "Temperature Controller#XXX ");
 				try
 				{
 					eq = em.GetMessageQueue();

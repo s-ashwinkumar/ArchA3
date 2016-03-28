@@ -150,6 +150,7 @@ class HumiditySensor
 			while ( !Done )
 			{
 				// Post the current relative humidity
+				HeartBeat.SendHeartBeat(em, "Humidity Sensor#XXX ");
 
 				PostHumidity( em, RelativeHumidity );
 

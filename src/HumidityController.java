@@ -139,6 +139,7 @@ class HumidityController
 
 			while ( !Done )
 			{
+				HeartBeat.SendHeartBeat(em, "Humidity Controller#XXX ");
 				try
 				{
 					eq = em.GetMessageQueue();

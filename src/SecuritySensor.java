@@ -99,7 +99,7 @@ class SecuritySensor {
 
             while (!Done) {
                 // Post the current temperature
-
+                HeartBeat.SendHeartBeat(em, "Security Sensor#XXX ");
                 // Get the message queue
                 try {
                     eq = em.GetMessageQueue();

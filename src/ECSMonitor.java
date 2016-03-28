@@ -130,6 +130,7 @@ class ECSMonitor extends Thread
 			while ( !Done )
 			{
 				// Here we get our message queue from the message manager
+				HeartBeat.SendHeartBeat(em, "ECSMonitor#XXX ");
 
 				try
 				{
