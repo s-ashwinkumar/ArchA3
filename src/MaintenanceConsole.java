@@ -173,13 +173,16 @@ class MaintenanceConsole
                 {
 
                     Msg = eq.GetMessage();
-                    if(Msg.GetMessageId() == -100 && set.contains(Msg.GetMessage()))
-                        continue;
-                    if( Msg.GetMessageId() == -100){
-                        String[] description = Msg.GetMessage().split("#");
-                        System.out.println( description[0] + "is on.");
-                        System.out.println( description[1]);
-                        set.add(Msg.GetMessage());
+                    if (Msg.GetMessageId() == -100) {
+                        String tempMessage = Msg.GetMessage();
+                        if (set.contains(tempMessage))
+                            continue;
+                        else {
+                            String[] description = tempMessage.split("#");
+                            System.out.println( description[0] + "is on.");
+                            System.out.println( description[1]);
+                            set.add(tempMessage);
+                        }
                     }
 
 
