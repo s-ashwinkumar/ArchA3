@@ -32,7 +32,7 @@ class SecuritySensor {
         boolean WindowTriggered = false;	// Window state: false == off, true == on
         boolean MSensorTriggered = false;	// Motion Sensor state: false == off, true == on
         int sensor = 0;
-        int Delay = 5000;				// The loop delay (5 seconds)
+        int Delay = 2500;				// The loop delay (5 seconds)
         boolean Done = false;			// Loop termination flag
 
         /////////////////////////////////////////////////////////////////////////////////

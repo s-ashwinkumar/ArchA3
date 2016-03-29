@@ -81,14 +81,41 @@ class SCSMonitor extends Thread {
 
     public void setWindowBroken(int windowBroken) {
         this.windowBroken = windowBroken;
+        mw.WriteMessage("Door window set to:: " + windowBroken);
+        if (arm == 1) {
+            updateAlarm();
+            Window(windowBroken == 1);
+            mw.WriteMessage("Window data to Controller:: " + (windowBroken == 1));
+        }
     }
 
     public void setDoorOpen(int doorOpen) {
         this.doorOpen = doorOpen;
+        mw.WriteMessage("Door data set to:: " + doorOpen);
+        if (arm == 1) {
+            updateAlarm();
+            Door(doorOpen == 1);
+            mw.WriteMessage("Door data to Controller:: " + (doorOpen == 1));
+        }
     }
 
     public void setMotionDetected(int motionDetected) {
         this.motionDetected = motionDetected;
+        mw.WriteMessage("Motion data set to:: " + motionDetected);
+        if (arm == 1) {
+            updateAlarm();
+            Motion(motionDetected == 1);
+            mw.WriteMessage("Motion data to Controller:: " + (motionDetected == 1));
+        }
+    }
+    
+    public void updateAlarm(){
+        mw.WriteMessage("Coming to reset alarm:: " );
+        if(doorOpen == 1 || windowBroken == 1 || motionDetected == 1){
+             di.SetLampColorAndMessage("Alarm Ringing", 3);
+        }else{
+             di.SetLampColorAndMessage("Alarm Not Ringing", 1);
+        }
     }
 
     public void run() {
@@ -110,7 +137,7 @@ class SCSMonitor extends Thread {
 
             mw = new MessageWindow("SCS Monitoring Console", 0, 0);
             di = new Indicator("SECURITY UNK", mw.GetX() + mw.Width(), 0);
-
+            setArm(1);
             mw.WriteMessage("Registered with the message manager.");
 
             try {
@@ -159,21 +186,21 @@ class SCSMonitor extends Thread {
                             int temp = Integer.valueOf(Msg.GetMessage());
                             switch (temp) {
                                 case 1:
-                                    doorOpen = 1;
+//                                    doorOpen = 1;
                                     mw.WriteMessage("Door Trigger from sensor: ");
                                     break;
                                 case 2:
-                                    windowBroken = 1;
+//                                    windowBroken = 1;
                                     mw.WriteMessage("window Trigger from sensor: ");
                                     break;
                                 case 3:
-                                    motionDetected = 1;
+//                                    motionDetected = 1;
                                     mw.WriteMessage("Motion Trigger from sensor: ");
                                     break;
                                 default:
-                                    doorOpen = 0;
-                                    windowBroken = 0;
-                                    motionDetected = 0;
+//                                    doorOpen = 0;
+//                                    windowBroken = 0;
+//                                    motionDetected = 0;
                                     mw.WriteMessage("No Trigger from sensor: ");
                             }
 
@@ -201,36 +228,15 @@ class SCSMonitor extends Thread {
                         } // catch
 
                         mw.WriteMessage("\n\nSimulation Stopped. \n");
-
+                        di.dispose();
                         // Get rid of the indicators. The message panel is left for the
                         // user to exit so they can see the last message posted.
-                        wi.dispose();
+                        if(wi != null)
+                            wi.dispose();
 
                     } // if
 
                 } // for
-
-                Door(doorOpen == 1);
-                mw.WriteMessage("Door data to Controller:: " + (doorOpen == 1));
-                Window(windowBroken == 1);
-                mw.WriteMessage("Window data to Controller:: " + (windowBroken == 1));
-                Motion(motionDetected == 1);
-                mw.WriteMessage("Motion data to Controller:: " + (motionDetected == 1));
-
-                if (arm == 1) // temperature is below threshhold
-                {
-                    mw.WriteMessage("System Armed:: ");
-                    if (doorOpen == 1 || windowBroken == 1 || motionDetected == 1) {
-                        di.SetLampColorAndMessage("Alarm Ringing", 3);
-                    } else {
-                        di.SetLampColorAndMessage("Alarm Not Ringing", 1);
-                    }
-                } else {
-
-                    mw.WriteMessage("System Disarmed:: ");
-                    di.SetLampColorAndMessage("System Deactivated", 2);
-
-                }
 
                 // This delay slows down the sample rate to Delay milliseconds
                 try {
@@ -282,6 +288,31 @@ class SCSMonitor extends Thread {
      */
     public void setArm(int arm) {
         this.arm = arm;
+        mw.WriteMessage("setting Arm to:: "+arm);
+        if (arm == 1) // temperature is below threshhold
+        {
+            mw.WriteMessage("System Armed:: ");
+            if (doorOpen == 1) {
+                di.SetLampColorAndMessage("Alarm Ringing", 3);
+                Door(doorOpen == 1);
+            }
+            else if (windowBroken == 1) {
+                di.SetLampColorAndMessage("Alarm Ringing", 3);
+                Window(windowBroken == 1);
+            }
+            else if ( motionDetected == 1) {
+                di.SetLampColorAndMessage("Alarm Ringing", 3);
+                Motion(motionDetected == 1);
+            }
+            else {
+                di.SetLampColorAndMessage("Alarm Not Ringing", 1);
+            }
+        } else {
+
+            mw.WriteMessage("System Disarmed:: ");
+            di.SetLampColorAndMessage("System Deactivated", 2);
+
+        }
     }
 
     /**

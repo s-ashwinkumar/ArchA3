@@ -95,7 +95,7 @@ public class SCSConsole {
                 } // if
                 
                 if (Option.equals("6") ) {
-                    Monitor.setCritical(false);
+                    
                     Monitor.setMotionDetected(0);
                     Monitor.setDoorOpen(0);
                     Monitor.setWindowBroken(0);
