@@ -38,6 +38,8 @@ class ECSMonitor extends Thread
 	MessageWindow mw = null;					// This is the message window
 	Indicator ti;								// Temperature indicator
 	Indicator hi;								// Humidity indicator
+	Random random = new Random();
+	private int ID = 0;
 
 	public ECSMonitor()
 	{
@@ -49,6 +51,7 @@ class ECSMonitor extends Thread
 			// that the message manager is on the local machine
 
 			em = new MessageManagerInterface();
+			ID = random.nextInt(20)%(20+1);
 
 		}
 
@@ -130,7 +133,7 @@ class ECSMonitor extends Thread
 			while ( !Done )
 			{
 				// Here we get our message queue from the message manager
-				HeartBeat.SendHeartBeat(em, "ECSMonitor#XXX ");
+				HeartBeat.SendHeartBeat(em, "ECSConsole-" + String.valueOf(ID) + "#ECSConsole displays the status of the temperature and humidity.");
 
 				try
 				{

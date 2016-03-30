@@ -49,6 +49,9 @@ class SCSMonitor extends Thread {
     boolean cancel = false;
     // end
 
+    Random random = new Random();
+    private int ID = 0;
+
     public SCSMonitor() {
         // message manager is on the local system
 
@@ -57,6 +60,7 @@ class SCSMonitor extends Thread {
             // that the message manager is on the local machine
 
             em = new MessageManagerInterface();
+            ID = random.nextInt(20)%(20+1);
 
         } catch (Exception e) {
             System.out.println("SCSMonitor::Error instantiating message manager interface: " + e);
@@ -222,8 +226,10 @@ class SCSMonitor extends Thread {
              */
             while (!Done) {
                 // Here we get our message queue from the message manager
+                HeartBeat.SendHeartBeat(em, "SCSConsole-" + String.valueOf(ID) + "#SCSConsole allows a guard to arm and disarm the system");
 
                 try {
+
                     eq = em.GetMessageQueue();
 
                 } // try

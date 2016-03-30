@@ -41,6 +41,8 @@ class HumiditySensor
 		float DriftValue;					// The amount of humidity gained or lost
 		int	Delay = 2500;					// The loop delay (2.5 seconds)
 		boolean Done = false;				// Loop termination flag
+		Random random = new Random();
+        int ID = random.nextInt(20)%(20+1);
 
 
 
@@ -150,7 +152,7 @@ class HumiditySensor
 			while ( !Done )
 			{
 				// Post the current relative humidity
-				HeartBeat.SendHeartBeat(em, "Humidity Sensor#XXX ");
+				HeartBeat.SendHeartBeat(em, "Humidity Sensor-" + String.valueOf(ID) + "#This is a process that simulates the action of a humidity sensor.");
 
 				PostHumidity( em, RelativeHumidity );
 

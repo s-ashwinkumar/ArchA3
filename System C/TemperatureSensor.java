@@ -148,7 +148,7 @@ class TemperatureSensor
 			while ( !Done )
 			{
 				// Post the current temperature
-				HeartBeat.SendHeartBeat(em, "Temperature Sensor#XXX ");
+				HeartBeat.SendHeartBeat(em, "Temperature Sensor-" + String.valueOf(ID) + "#This is a process that simulates the action of a temperature sensor. ");
 				PostTemperature( em, CurrentTemperature );
 
 				mw.WriteMessage("Current Temperature::  " + CurrentTemperature + " F");

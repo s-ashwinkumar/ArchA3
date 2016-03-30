@@ -45,6 +45,8 @@ class HumidityController
 		boolean DehumidifierState = false;	// Dehumidifier state: false == off, true == on
 		int	Delay = 2500;					// The loop delay (2.5 seconds)
 		boolean Done = false;				// Loop termination flag
+		Random random = new Random();
+        int ID = random.nextInt(20)%(20+1);
 
 		/////////////////////////////////////////////////////////////////////////////////
 		// Get the IP address of the message manager
@@ -139,7 +141,7 @@ class HumidityController
 
 			while ( !Done )
 			{
-				HeartBeat.SendHeartBeat(em, "Humidity Controller#XXX ");
+				HeartBeat.SendHeartBeat(em, "Humidity Controller" + String.valueOf(ID) + "#The humidity controller is a process that interfaces with, and controls two devices: a humidifier to add moisture to the air, and a dehumidifier to remove moisture from the air.");
 				try
 				{
 					eq = em.GetMessageQueue();

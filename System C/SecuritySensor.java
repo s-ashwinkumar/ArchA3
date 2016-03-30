@@ -34,6 +34,8 @@ class SecuritySensor {
         int sensor = 0;
         int Delay = 2500;				// The loop delay (5 seconds)
         boolean Done = false;			// Loop termination flag
+        Random random = new Random();
+        int ID = random.nextInt(20)%(20+1);
 
         /////////////////////////////////////////////////////////////////////////////////
         // Get the IP address of the message manager
@@ -99,7 +101,7 @@ class SecuritySensor {
 
             while (!Done) {
                 // Post the current temperature
-                HeartBeat.SendHeartBeat(em, "Security Sensor#XXX ");
+                HeartBeat.SendHeartBeat(em, "Security Sensor-" + String.valueOf(ID) + "#Security Sensor detects window break, door break, and motion detection.");
                 // Get the message queue
                 try {
                     eq = em.GetMessageQueue();

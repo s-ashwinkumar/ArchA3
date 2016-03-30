@@ -22,6 +22,8 @@ class FireSensor {
         boolean state = false;	// Door state: false == off, true == on
         int Delay = 2500;				// The loop delay (5 seconds)
         boolean Done = false;			// Loop termination flag
+        Random random = new Random();
+        int ID = random.nextInt(20)%(20+1);
 
         /////////////////////////////////////////////////////////////////////////////////
         // Get the IP address of the message manager
@@ -87,7 +89,7 @@ class FireSensor {
 
             while (!Done) {
                 // Post the current temperature
-                //HeartBeat.SendHeartBeat(em, "Fire Sensor#XXX ");
+                HeartBeat.SendHeartBeat(em, "Fire Sensor-" + String.valueOf(ID) + "#Fire sensor detect whether there is a fire.");
                 // Get the message queue
                 try {
                     eq = em.GetMessageQueue();

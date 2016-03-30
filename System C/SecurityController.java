@@ -41,6 +41,8 @@ class SecurityController
 		boolean MSensorState = false;		// Motion Sensor state: false == off, true == on
 		int	Delay = 2500;					// The loop delay (2.5 seconds)
 		boolean Done = false;				// Loop termination flag
+		Random random = new Random();
+        int ID = random.nextInt(20)%(20+1);
 
 		/////////////////////////////////////////////////////////////////////////////////
 		// Get the IP address of the message manager
@@ -136,7 +138,7 @@ class SecurityController
 
 			while ( !Done )
 			{
-
+				HeartBeat.SendHeartBeat(em, "Security Controller-" + String.valueOf(ID) + "#This is a process that controls the Security Alarm.");
 				try
 				{
 					eq = em.GetMessageQueue();
@@ -162,7 +164,6 @@ class SecurityController
 				for ( int i = 0; i < qlen; i++ )
 				{
 					Msg = eq.GetMessage();
-					HeartBeat.SendHeartBeat(em, "Security Controller#XXX ");
 
 					if ( Msg.GetMessageId() == 6 )
 					{

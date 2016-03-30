@@ -23,6 +23,8 @@ class FireAlarmController
 		boolean state = false;
 		int	Delay = 2500;					// The loop delay (2.5 seconds)
 		boolean Done = false;				// Loop termination flag
+		Random random = new Random();
+		int ID = random.nextInt(20)%(20+1);
 
 		/////////////////////////////////////////////////////////////////////////////////
 		// Get the IP address of the message manager
@@ -116,7 +118,7 @@ class FireAlarmController
 
 			while ( !Done )
 			{
-
+				HeartBeat.SendHeartBeat(em, "Fire Alarm Controller-" + String.valueOf(ID) + "#The Fire Alarm Controller control the fire alarm.");
 				try
 				{
 					eq = em.GetMessageQueue();
@@ -142,7 +144,7 @@ class FireAlarmController
 				for ( int i = 0; i < qlen; i++ )
 				{
 					Msg = eq.GetMessage();
-					//HeartBeat.SendHeartBeat(em, "Fire Alarm Controller#XXX ");
+					
 
 					if ( Msg.GetMessageId() == 12 )
 					{
