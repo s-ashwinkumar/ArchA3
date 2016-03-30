@@ -1,5 +1,5 @@
 %ECHO OFF
-%ECHO Starting ECS System
+%ECHO Starting System A
 PAUSE
 %ECHO Starting Temperature Controller Console
 START "TEMPERATURE CONTROLLER CONSOLE" /MIN /NORMAL java TemperatureController %1
@@ -19,10 +19,3 @@ START "SECURITY CONTROLLER CONSOLE" /MIN /NORMAL java SecurityController %1
 START "SECURITY SENSOR CONSOLE" /MIN /NORMAL java SecuritySensor %1
 %ECHO SCS Monitoring Console
 START "MUSEUM SECURITY CONTROL SYSTEM CONSOLE" /NORMAL java SCSConsole %1
-%ECHO Starting Sprinkler Control Console
-START "SECURITY CONTROLLER CONSOLE" /MIN /NORMAL java SprinklerController %1
-%ECHO Starting Fire Alarm Control Console
-START "SECURITY CONTROLLER CONSOLE" /MIN /NORMAL java FireAlarmController %1
-%ECHO Starting Fire Alarm Sensor Console
-START "SECURITY CONTROLLER CONSOLE" /MIN /NORMAL java FireSensor %1
-

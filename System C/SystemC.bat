@@ -26,3 +26,7 @@ START "SECURITY CONTROLLER CONSOLE" /MIN /NORMAL java FireAlarmController %1
 %ECHO Starting Fire Alarm Sensor Console
 START "SECURITY CONTROLLER CONSOLE" /MIN /NORMAL java FireSensor %1
 
+%ECHO Starting Maintenance Console System
+
+%ECHO Starting Maintenance Console
+START "MAINTENANCE CONSOLE" /MIN /NORMAL java MaintenanceConsole %1
