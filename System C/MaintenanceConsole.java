@@ -171,6 +171,7 @@ class MaintenanceConsole
 
                 int qlen = eq.GetSize();
                 Set<String> set = new HashSet<String>();
+                int count = 0;
                 for ( int i = 0; i < qlen; i++ )
                 {
 
@@ -180,8 +181,9 @@ class MaintenanceConsole
                         if (set.contains(tempMessage))
                             continue;
                         else {
+                            count++;
                             String[] description = tempMessage.split("#");
-                            System.out.println( " * " + description[0] + " is on.");
+                            System.out.println( " " + String.valueOf(count) + ". " + description[0] + " is on.");
                             System.out.println( "   " +description[1]);
                             set.add(tempMessage);
                         }
