@@ -40,6 +40,8 @@ class TemperatureSensor
 		float DriftValue;				// The amount of temperature gained or lost
 		int	Delay = 2500;				// The loop delay (2.5 seconds)
 		boolean Done = false;			// Loop termination flag
+		Random random = new Random();
+        int ID = random.nextInt(20)%(20+1);
 
 		/////////////////////////////////////////////////////////////////////////////////
 		// Get the IP address of the message manager
