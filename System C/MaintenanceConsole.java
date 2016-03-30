@@ -143,6 +143,8 @@ class MaintenanceConsole
             ** Here we start the main simulation loop
             *********************************************************************/
 
+            //overall set
+            Set<String> overAllSet = new HashSet<String>();
             while ( !Done )
             {
                 System.out.println("-----Check Start-----");
@@ -183,6 +185,7 @@ class MaintenanceConsole
                             System.out.println( description[1]);
                             set.add(tempMessage);
                         }
+                        overAllSet.add(tempMessage);
                     }
 
 
@@ -217,6 +220,20 @@ class MaintenanceConsole
                     } // if
 
                 } // for
+
+                //check for the health
+                Iterator<String> it = overAllSet.iterator();
+                while (it.hasNext()) {
+                    String str = it.next();
+                    if (set.contains(str))
+                        continue;
+                    else {
+                        String[] description = str.split("#");
+                        System.out.println( description[0] + "is off.");
+                        System.out.println( description[1]);
+                    }
+                }
+
                 System.out.println("-----Check End-----");
 
                 try
