@@ -181,8 +181,8 @@ class MaintenanceConsole
                             continue;
                         else {
                             String[] description = tempMessage.split("#");
-                            System.out.println( description[0] + "is on.");
-                            System.out.println( description[1]);
+                            System.out.println( " * " + description[0] + " is on.");
+                            System.out.println( "   " +description[1]);
                             set.add(tempMessage);
                         }
                         overAllSet.add(tempMessage);
