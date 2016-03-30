@@ -231,7 +231,7 @@ class MaintenanceConsole
                         continue;
                     else {
                         String[] description = str.split("#");
-                        System.out.println( description[0] + "is off.");
+                        System.out.println( " * " + description[0] + " is off.");
                         System.out.println( description[1]);
                     }
                 }
