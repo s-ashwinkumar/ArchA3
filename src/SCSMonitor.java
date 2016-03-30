@@ -40,6 +40,15 @@ class SCSMonitor extends Thread {
     int doorOpen = 0;
     int motionDetected = 0;
 
+    // for system B
+    boolean fireAlarm = false;
+    boolean sprinkler = false;
+    long alarmTime = 0;
+    long tempTime = 0;
+    boolean confirm = false;
+    boolean cancel = false;
+    // end
+
     public SCSMonitor() {
         // message manager is on the local system
 
@@ -117,6 +126,62 @@ class SCSMonitor extends Thread {
              di.SetLampColorAndMessage("Alarm Not Ringing", 1);
         }
     }
+
+    public void triggerFireAlarm(){
+        this.fireAlarm = true;
+        if(alarmTime == 0){
+            this.alarmTime = System.currentTimeMillis();
+            mw.WriteMessage("Fire Alarm! Please confirm or cancel sprinkler action. ");
+            Fire(fireAlarm);
+        }else{
+            mw.WriteMessage("Fire already alarmed.");
+        }
+    }
+
+    public boolean confirmSprinkler() {
+        if(this.fireAlarm == true){
+            this.sprinkler = true;
+            this.confirm = true;
+            this.cancel = false;
+            mw.WriteMessage("Fire Alarm! Confirm turning on sprinkler. Now you can turn off it.");
+            SprinklerControl(sprinkler);
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public boolean holy() {
+        if(this.fireAlarm == true){
+            this.fireAlarm = false;
+            this.cancel = false;
+            this.confirm = false;
+            this.alarmTime = 0;
+            this.sprinkler = false;
+            mw.WriteMessage("Cancel sprinkler. Fire alarm is off.");
+            Fire(fireAlarm);
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public boolean cancelSprinkler() {
+        if(this.sprinkler == true){
+            this.sprinkler = false;
+            this.alarmTime = 0;
+            this.fireAlarm = false;
+            this.confirm = false;
+            this.cancel = true;
+            mw.WriteMessage("Turn off sprinkler.");
+            SprinklerControl(sprinkler);
+            //Fire(fireAlarm);
+            return true;
+        }else{
+            return false;
+        }
+    }
+
 
     public void run() {
         Message Msg = null;				// Message object
@@ -212,6 +277,16 @@ class SCSMonitor extends Thread {
 
                     } // if
 
+                    if(Msg.GetMessageId() == 22 && Msg.GetMessage().equalsIgnoreCase("ON")){
+                        mw.WriteMessage("Fire Trigger from sensor ");
+                    }
+
+                    if(Msg.GetMessageId() == 22 && Msg.GetMessage().equalsIgnoreCase("OFF")){
+                        //fireAlarm = false;
+                        //Fire(fireAlarm);
+                        //mw.WriteMessage("No Fire from sensor ");
+                    }
+
                     // If the message ID == 99 then this is a signal that the simulation
                     // is to end. At this point, the loop termination flag is set to
                     // true and this process unregisters from the message manager.
@@ -237,6 +312,14 @@ class SCSMonitor extends Thread {
                     } // if
 
                 } // for
+
+                if(fireAlarm && !sprinkler && !confirm && System.currentTimeMillis() - alarmTime >= 10000){
+                    sprinkler = true;
+                    confirm = true;
+                    cancel = false;
+                    mw.WriteMessage("Fire Alarm! No input in 10s. Automatically turn on sprinkler. Now you can turn off it.");
+                    SprinklerControl(sprinkler);
+                }
 
                 // This delay slows down the sample rate to Delay milliseconds
                 try {
@@ -467,5 +550,59 @@ class SCSMonitor extends Thread {
         } // catch
 
     }
+
+    // for system B
+    private void Fire(boolean status) {
+        // Here we create the message.
+
+        Message msg;
+
+        if (status) {
+            msg = new Message((int) 12, "ON");
+
+        } else {
+
+            msg = new Message((int) 12, "OFF");
+
+        } // if
+
+        // Here we send the message to the message manager.
+        try {
+            em.SendMessage(msg);
+
+        } // try
+        catch (Exception e) {
+            System.out.println("Error sending fire alarm message:: " + e);
+
+        } // catch
+
+    }
+
+    private void SprinklerControl(boolean status) {
+        // Here we create the message.
+
+        Message msg;
+
+        if (status) {
+            msg = new Message((int) 13, "ON");
+
+        } else {
+
+            msg = new Message((int) 13, "OFF");
+
+        } // if
+
+        // Here we send the message to the message manager.
+        try {
+            em.SendMessage(msg);
+
+        } // try
+        catch (Exception e) {
+            System.out.println("Error sending sprinkler message:: " + e);
+
+        } // catch
+
+    }
+    // end
 
 } // SCSMonitor

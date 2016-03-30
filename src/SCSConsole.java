@@ -64,6 +64,12 @@ public class SCSConsole {
                 System.out.println("4: Trigger Door sensor");
                 System.out.println("5: Trigger window sensor");
                 System.out.println("6: Reboot All sensors");
+                // for system B
+                System.out.println("7: Trigger fire alarm");
+                System.out.println("8: Confirm sprinkler action");
+                System.out.println("9: Cancel sprinkler action");
+                System.out.println("10: Turn off sprinkler action");
+                // end
                 System.out.println("X: Stop System\n");
                 System.out.print("\n>>>> ");
                 Option = UserInput.KeyboardReadString();
@@ -100,6 +106,34 @@ public class SCSConsole {
                     Monitor.setDoorOpen(0);
                     Monitor.setWindowBroken(0);
                 } // if
+
+                // for system B
+                if (Option.equals("7") ) {
+                       
+                    Monitor.triggerFireAlarm();
+                } // if
+                
+                if (Option.equals("8") ) {                      
+                    if(Monitor.confirmSprinkler() == false){
+                        System.out.println("There is no fire alarm.");
+                    }
+                } // if
+                
+                if (Option.equals("9") ) {
+                    if(Monitor.holy() == false){
+                        System.out.println("There is no fire alarm.");
+                    }else{
+                        System.out.println("Cancel the action. There is no fire.");
+                    }
+                }
+                
+                if (Option.equals("10") ) {
+                       
+                    if(Monitor.cancelSprinkler() == false){
+                         System.out.println("Sprinkler hasn't started.");
+                    }
+                } // if
+                //end
                 
                 //////////// option X ////////////
                 if (Option.equalsIgnoreCase("X")) {
